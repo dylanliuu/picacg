@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -84,10 +85,23 @@ namespace PicACG.Services
             {
                 var jsonStr = await response.Content.ReadAsStringAsync();
 
+                // TODO:// 返回类型
                 return true;
             }
 
             return false;
+        }
+
+        public async Task Register(Register user)
+        {
+            var userJsonStr = JsonConvert.SerializeObject(user);
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
+            var response = await _client.PostAsync("auth/register", new StringContent(userJsonStr));
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                // TODO:// 返回类型
+            }
         }
 
         public async Task<Profile?> GetUserInfo()
@@ -116,12 +130,13 @@ namespace PicACG.Services
             {
                 var jsonStr = await response.Content.ReadAsStringAsync();
 
+                // TODO:// 返回类型
                 return true;
             }
 
             return false;
         }
-        
+
         public async Task<Category?> GetCategories()
         {
             _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
@@ -139,84 +154,166 @@ namespace PicACG.Services
 
             return null;
         }
-        
-        public Task<Favorite> GetFavorites()
+
+        public async Task<ICollection<Favorite>?> GetFavorites(int page)
         {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-        
-        public Task<bool> AddFavorite(Favorite favorite)
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-        
-        public Task Register(Register user)
-        {
-            throw new NotImplementedException();
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+            var response = await _client.GetAsync($"users/favourite?s=da&page={page}");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+
+                var favorites = JsonConvert.DeserializeObject<ICollection<Favorite>>(jsonStr);
+                if (favorites is not null)
+                {
+                    return favorites;
+                }
+            }
+
+            return null;
         }
 
-        public Task CategoriesSearch()
+        public async Task<bool> AddFavorite(string comicId)
         {
             _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
+            var response = await _client.PostAsync($"comics/{comicId}/favourite", null);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+
+                return true;
+            }
+
+            return false;
+        }
+        
+        public async Task CategoriesSearch(int page, string sort, IEnumerable<Category> categories)
+        {
+            var categoriesJsonStr = JsonConvert.SerializeObject(categories);
+
+            if (string.IsNullOrWhiteSpace(categoriesJsonStr))
+            {
+                throw new NullReferenceException();
+            }
+
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+
+            var response = await _client.GetAsync($"comics?page={page}&c={categories}&s={sort}");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                // TODO:// 返回类型
+            }
         }
 
+        public async Task AdvancedSearch(int page, string sort, IEnumerable<Category> categories, string keyword)
+        {
+            var reqJsonStr = JsonConvert.SerializeObject(new
+            {
+                Categories = categories,
+                Keyword = keyword,
+                Sort = sort
+            });
+
+            if (string.IsNullOrWhiteSpace(reqJsonStr))
+            {
+                throw new NullReferenceException();
+            }
+
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
+            var response =
+                await _client.PostAsync($"comics/advanced-search?page={page}", new StringContent(reqJsonStr));
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                // TODO:// 返回类型
+            }
+        }
+        
+        public async Task GetRank(string tt)
+        {
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+            var response = await _client.GetAsync($"comics/leaderboard?tt={tt}&ct=VC");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                // TODO:// 返回类型
+            }
+        }
+
+        public async Task<Comic?> GetComic(string comicId)
+        {
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+            var response = await _client.GetAsync($"comics/{comicId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                var comic = JsonConvert.DeserializeObject<Comic>(jsonStr);
+                if (comic is not null)
+                {
+                    return comic;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task<ComicEps?> GetComicEps(string comicId, int page)
+        {
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+            var response = await _client.GetAsync($"comics/{comicId}/eps?page={page}");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                var comicEps = JsonConvert.DeserializeObject<ComicEps>(jsonStr);
+                if (comicEps is not null)
+                {
+                    return comicEps;
+                }
+            }
+
+            return null;
+        }
+
+        public async Task GetComicOrder(string comicId, string epsId, int page)
+        {
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+            var response = await _client.GetAsync($"comics/{comicId}/order/{epsId}/pages?page={page}");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                // TODO:// 返回类型
+            }
+        }
+
+        public async Task GetComments(string comicId, int page)
+        {
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.GET));
+            var response = await _client.GetAsync($"comics/{comicId}/comments?page={page}");
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonStr = await response.Content.ReadAsStringAsync();
+                // TODO:// 返回类型
+            }
+        }
+
+        /// <summary>
+        /// TODO:// 下载功能实现
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Task DownloadComic()
+        {
+            throw new NotImplementedException();
+        }
+        
+        /// <summary>
+        /// TODO:// 获取更新
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public Task CheckUpdate()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task GetBook()
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-
-        public Task<Comic> GetComic(string comicId)
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-
-        public Task<ComicEps> GetComicEps(string comicId, string page)
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-
-        public Task GetComicOrder(string comicId, string epsId, string page)
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-
-        public Task GetComments()
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-
-        public Task GetRank()
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
-            throw new NotImplementedException();
-        }
-
-        public Task AdvancedSearch()
-        {
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(Method.POST));
-            var response = await _client.PostAsync("auth/sign-in", new StringContent(content));
             throw new NotImplementedException();
         }
     }
