@@ -10,7 +10,7 @@ namespace PicACG.ViewModels
 {
     public class ItemsViewModel : BaseViewModel
     {
-        private Item _selectedItem;
+        private Item _selectedItem = null!;
 
         public ObservableCollection<Item> Items { get; }
         public Command LoadItemsCommand { get; }
@@ -57,13 +57,13 @@ namespace PicACG.ViewModels
             SelectedItem = null;
         }
 
-        public Item SelectedItem
+        public Item? SelectedItem
         {
             get => _selectedItem;
             set
             {
-                SetProperty(ref _selectedItem, value);
-                OnItemSelected(value);
+                SetProperty(ref _selectedItem!, value);
+                OnItemSelected(value!);
             }
         }
 

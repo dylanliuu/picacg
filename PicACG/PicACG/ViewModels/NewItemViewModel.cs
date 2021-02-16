@@ -9,8 +9,8 @@ namespace PicACG.ViewModels
 {
     public class NewItemViewModel : BaseViewModel
     {
-        private string text;
-        private string description;
+        private string text = null!;
+        private string description = null!;
 
         public NewItemViewModel()
         {

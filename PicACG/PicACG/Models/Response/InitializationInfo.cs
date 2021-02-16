@@ -2,7 +2,7 @@
 
 namespace PicACG.Models.Response
 {
-    public class Initialization
+    public class InitializationInfo
     {
         public string? Status { get; set; }
         public ICollection<string>? Addresses { get; set; }

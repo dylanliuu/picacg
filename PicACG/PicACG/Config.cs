@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -16,14 +18,15 @@ namespace PicACG
         public static readonly string Accept = "application/vnd.picacomic.com.v1+json";
         public static readonly string Agent = "okhttp/3.8.1";
         public static readonly string Platform = "android";
-        public static readonly string Now = DateTime.Now.ToString("s");
-        public static readonly string Nonce = Guid.NewGuid().ToString().Replace("-", string.Empty);
+        public static readonly string Now = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        public static readonly string Nonce = Guid.NewGuid().ToString().Replace("-", "");
+        public static readonly string Host = "picaapi.picacomic.com";
 
         public static readonly int ThreadNum = 10;
         public static readonly int DownloadThreadNum = 5;
         public static readonly ImageQuality ImageQuality = ImageQuality.original;
         public static readonly string Uuid = "defaultUuid";
-        public static readonly string HttpProxy = "";
+        public static readonly string HttpProxy = "http://127.0.0.1:10888";
         public static readonly string SavePath = "";
         public static readonly string SavePathDir = "commies";
         public static readonly int ResetCnt = 5;
@@ -33,9 +36,23 @@ namespace PicACG
         public static readonly string UpdateUrl = "";
         public static readonly string UpdateVersion = "v1.0.5";
 
-        public static string GetSignature(Method method)
+        private const string SecretKey = "~d}$Q7$eIni=V)9\\RK/P.RM4;9[7|@/CA}b~OW!3?EV`:<>M7pddUBL5n|0/*Cn";
+
+        public static string GetSignature(string uri, Method method)
         {
-            return Now + Nonce + method + ApiKey + Version;
+            return GetSha256Base64(uri + Now + Nonce + method + ApiKey);
+        }
+
+        private static string GetSha256Base64(string input)
+        {
+            var sha256 = new HMACSHA256(Encoding.UTF8.GetBytes(SecretKey));
+            if (sha256 is null)
+            {
+                throw new NullReferenceException();
+            }
+
+            var secretBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+            return BitConverter.ToString(secretBytes).Replace("-", "").ToLower();
         }
     }
 

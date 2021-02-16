@@ -11,13 +11,13 @@ namespace PicACG.Services
         /// 获取IP
         /// </summary>
         /// <returns></returns>
-        Task<Initialization?> Init();
+        Task<InitializationInfo?> Init();
 
         /// <summary>
         /// 获取Image的Key
         /// </summary>
         /// <returns></returns>
-        Task<Initialization?> InitAndroid();
+        Task<ResponseResult?> InitAndroid();
 
         /// <summary>
         /// 登陆

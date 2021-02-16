@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PicACG", "PicACG\PicACG\Pic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PicACG.Android", "PicACG\PicACG.Android\PicACG.Android.csproj", "{D0117754-2D3D-4D4A-9859-D255B4C0A36E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{6AA7263B-7D31-43D3-AF75-A5B098525ABB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{D0117754-2D3D-4D4A-9859-D255B4C0A36E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0117754-2D3D-4D4A-9859-D255B4C0A36E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0117754-2D3D-4D4A-9859-D255B4C0A36E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{6AA7263B-7D31-43D3-AF75-A5B098525ABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA7263B-7D31-43D3-AF75-A5B098525ABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA7263B-7D31-43D3-AF75-A5B098525ABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA7263B-7D31-43D3-AF75-A5B098525ABB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

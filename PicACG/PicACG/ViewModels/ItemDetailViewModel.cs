@@ -9,10 +9,10 @@ namespace PicACG.ViewModels
     [QueryProperty(nameof(ItemId), nameof(ItemId))]
     public class ItemDetailViewModel : BaseViewModel
     {
-        private string itemId;
-        private string text;
-        private string description;
-        public string Id { get; set; }
+        private string itemId = null!;
+        private string text = null!;
+        private string description = null!;
+        public string? Id { get; set; }
 
         public string Text
         {
@@ -45,8 +45,8 @@ namespace PicACG.ViewModels
             {
                 var item = await DataStore.GetItemAsync(itemId);
                 Id = item.Id;
-                Text = item.Text;
-                Description = item.Description;
+                Text = item.Text!;
+                Description = item.Description!;
             }
             catch (Exception)
             {
