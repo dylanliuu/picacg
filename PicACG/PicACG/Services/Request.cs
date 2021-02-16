@@ -49,15 +49,9 @@ namespace PicACG.Services
 
         public async Task<bool> SignIn(SignIn input)
         {
-            var content = JsonConvert.SerializeObject(input);
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                throw new NullReferenceException();
-            }
-
             var uri = "auth/sign-in";
 
-            var jsonStr1 = await Client.PostAsync(uri, content);
+            var jsonStr1 = await Client.PostAsync(uri, input);
 
             return true;
         }
@@ -65,9 +59,8 @@ namespace PicACG.Services
         public async Task Register(Register user)
         {
             var uri = "auth/register";
-            var userJsonStr = JsonConvert.SerializeObject(user);
 
-            var jsonStr = await Client.PostAsync(uri, userJsonStr);
+            var jsonStr = await Client.PostAsync(uri, user);
             if (jsonStr is not null)
             {
                 // TODO:// 返回类型

@@ -18,15 +18,15 @@ namespace PicACG
         public static readonly string Accept = "application/vnd.picacomic.com.v1+json";
         public static readonly string Agent = "okhttp/3.8.1";
         public static readonly string Platform = "android";
+        public static readonly ImageQuality ImageQuality = ImageQuality.original;
+        public static readonly string HttpProxy = "http://127.0.0.1:10888";
         public static readonly string Now = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        public static readonly string Uuid = "defaultUuid";
         public static readonly string Nonce = Guid.NewGuid().ToString().Replace("-", "");
         public static readonly string Host = "picaapi.picacomic.com";
 
         public static readonly int ThreadNum = 10;
         public static readonly int DownloadThreadNum = 5;
-        public static readonly ImageQuality ImageQuality = ImageQuality.original;
-        public static readonly string Uuid = "defaultUuid";
-        public static readonly string HttpProxy = "http://127.0.0.1:10888";
         public static readonly string SavePath = "";
         public static readonly string SavePathDir = "commies";
         public static readonly int ResetCnt = 5;

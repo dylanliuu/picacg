@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace PicACG.Services
 {
@@ -10,6 +12,18 @@ namespace PicACG.Services
     {
         private static readonly object LockObj = new();
         private static HttpClient? _client;
+
+        private static readonly JsonSerializerSettings Json = new()
+        {
+            // 默认值
+            DefaultValueHandling = DefaultValueHandling.Include,
+
+            // 驼峰命名
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+
+            // 不要循环序列化
+            ReferenceLoopHandling = ReferenceLoopHandling.Error
+        };
 
         public HttpClientHelper()
         {
@@ -49,20 +63,24 @@ namespace PicACG.Services
         /// 异步Post
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="strJson"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public async Task<string?> PostAsync(string url, string? strJson) //post异步请求方法
+        public async Task<string?> PostAsync(string url, object? obj) //post异步请求方法
         {
             if (_client is null)
             {
                 throw new NullReferenceException();
             }
 
-            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(url, Method.POST));
-            _client.DefaultRequestHeaders.Connection.Add("keep-alive");
+            StringContent? content = null;
+            if (obj is not null)
+            {
+                var strJon = JsonConvert.SerializeObject(obj, Json);
+                content = new StringContent(strJon, Encoding.UTF8, "application/json");
+            }
 
-            var content = strJson is null ? null : new StringContent(strJson, Encoding.UTF8, "application/json");
+            _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(url, Method.POST));
 
             var res = await _client.PostAsync(url, content);
             if (res.StatusCode == HttpStatusCode.OK)
@@ -77,10 +95,10 @@ namespace PicACG.Services
         /// 同步Post
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="strJson"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
         /// <exception cref="NullReferenceException"></exception>
-        public string? Post(string url, string? strJson) //post同步请求方法
+        public string? Post(string url, object? obj) //post同步请求方法
         {
             if (_client is null)
             {
@@ -88,16 +106,20 @@ namespace PicACG.Services
             }
 
             _client.DefaultRequestHeaders.Add("signature", Config.GetSignature(url, Method.POST));
-            _client.DefaultRequestHeaders.Connection.Add("keep-alive");
 
-            var content = strJson is null ? null : new StringContent(strJson, Encoding.UTF8, "application/json");
+            StringContent? content = null;
+            if (obj is not null)
+            {
+                var strJon = JsonConvert.SerializeObject(obj, Json);
+                content = new StringContent(strJon, Encoding.UTF8, "application/json");
+            }
 
             Task<HttpResponseMessage> res = _client.PostAsync(url, content);
             if (res.Result.StatusCode == HttpStatusCode.OK)
             {
                 return res.Result.Content.ReadAsStringAsync().Result;
             }
-            
+
             return null;
         }
 

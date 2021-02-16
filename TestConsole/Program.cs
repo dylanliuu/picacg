@@ -12,8 +12,8 @@ namespace TestConsole
             
             var input = new SignIn
             {
-                email = "abc",
-                password = "abc"
+                Email = "abc",
+                Password = "abc"
             };
             
             await service.SignIn(input);
