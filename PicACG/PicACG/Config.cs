@@ -12,7 +12,7 @@ namespace PicACG
         public static readonly string Url = "https://picaapi.picacomic.com/";
         public static readonly string ApiKey = "C69BAF41DA5ABD1FFEDC6D2FEA56B";
 
-        public static readonly string AppChannel = "3";
+        public static readonly string AppChannel = "1";
         public static readonly string Version = "2.2.1.3.3.4";
         public static readonly string BuildVersion = "45";
         public static readonly string Accept = "application/vnd.picacomic.com.v1+json";
@@ -40,10 +40,10 @@ namespace PicACG
 
         public static string GetSignature(string uri, Method method)
         {
-            return GetSha256Base64(uri + Now + Nonce + method + ApiKey);
+            return GetSha256(uri + Now + Nonce + method + ApiKey);
         }
 
-        private static string GetSha256Base64(string input)
+        private static string GetSha256(string input)
         {
             var sha256 = new HMACSHA256(Encoding.UTF8.GetBytes(SecretKey));
             if (sha256 is null)
@@ -51,7 +51,8 @@ namespace PicACG
                 throw new NullReferenceException();
             }
 
-            var secretBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+            var secretBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input.ToLower()));
+
             return BitConverter.ToString(secretBytes).Replace("-", "").ToLower();
         }
     }

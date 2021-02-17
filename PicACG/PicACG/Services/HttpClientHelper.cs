@@ -38,8 +38,20 @@ namespace PicACG.Services
                 {
                     if (_client == null)
                     {
-                        var handler = new HttpClientHandler {Proxy = new WebProxy(Config.HttpProxy)};
-                        _client = new HttpClient(handler) {BaseAddress = new Uri(Config.Url)};
+                        var proxy = new WebProxy
+                        {
+                            Address = new Uri(Config.HttpProxy)
+                        };
+                        
+                        var handler = new HttpClientHandler
+                        {
+                            Proxy = proxy
+                        };
+                        
+                        _client = new HttpClient(handler)
+                        {
+                            BaseAddress = new Uri(Config.Url)
+                        };
 
                         // _client.DefaultRequestHeaders.Host = Config.Host;
                         _client.DefaultRequestHeaders.Add("accept", Config.Accept);
@@ -87,7 +99,7 @@ namespace PicACG.Services
             {
                 return await res.Content.ReadAsStringAsync();
             }
-
+            
             return null;
         }
 
